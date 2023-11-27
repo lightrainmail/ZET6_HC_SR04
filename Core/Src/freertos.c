@@ -63,8 +63,6 @@ const osThreadAttr_t APP_SR04_attributs = {
 
 };
 
-uint16_t TIM_CounterNum1 = 0;
-uint16_t TIM_CounterNum2 = 0;
 uint16_t deltaTim = 0;
 float Distance_mm = 0.0;
 uint8_t EXTIState = 0;
@@ -151,6 +149,7 @@ void APPTask_Main(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+/*FreeRTOS task: LCD task*/
 void APP_LCDTask(void * param) {
     /*LCD Init*/
     LCD_Init(WHITE);
@@ -194,6 +193,7 @@ void EXTI1_Falling(void) {
     HAL_GPIO_Init(Echo_GPIO_Port,&GPIO_InitStruct);
 }
 
+/*FreeRTOS task: HC-SR04 task*/
 void APP_SR04Task(void * param) {
 
     TickType_t tick = pdMS_TO_TICKS(100);
@@ -208,8 +208,6 @@ void APP_SR04Task(void * param) {
         taskEXIT_CRITICAL();
         HAL_GPIO_WritePin(Trig_GPIO_Port,Trig_Pin,GPIO_PIN_RESET);
 
-        __HAL_TIM_SET_COUNTER(&htim7,0x0000);
-
         //Set Rising
         EXTI1_Rising();
 
@@ -219,7 +217,6 @@ void APP_SR04Task(void * param) {
 
         vTaskDelay(tick);   //delay 100ms
         taskENTER_CRITICAL();
-        deltaTim = TIM_CounterNum2 - TIM_CounterNum1;
         Distance_mm = 17.0*deltaTim/100;
         taskEXIT_CRITICAL();
     }
@@ -230,13 +227,12 @@ void APP_SR04Task(void * param) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if(EXTIState == 0) {    //Rising into
-        TIM_CounterNum1 = __HAL_TIM_GET_COUNTER(&htim7);
+        __HAL_TIM_SET_COUNTER(&htim7,0x0000);
         EXTIState = 1;
-
         //Set exti falling
         EXTI1_Falling();
     } else if(EXTIState == 1) {
-        TIM_CounterNum2 = __HAL_TIM_GET_COUNTER(&htim7);
+        deltaTim = __HAL_TIM_GET_COUNTER(&htim7);
     }
 
 }
