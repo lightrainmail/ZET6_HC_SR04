@@ -141,7 +141,8 @@ void APP_SR04Task(void * param) {
 
         vTaskDelay(tick);   //delay 100ms
         taskENTER_CRITICAL();
-        Distance_mm = 17.0*deltaTim/100;
+//        Distance_mm = 17.0*deltaTim/100;
+        Distance_mm = 17*deltaTim/100;
         taskEXIT_CRITICAL();
     }
 }
