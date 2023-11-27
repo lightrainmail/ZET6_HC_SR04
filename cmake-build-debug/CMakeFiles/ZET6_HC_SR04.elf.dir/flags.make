@@ -7,11 +7,11 @@ ASM_DEFINES = -DDEBUG -DSTM32F103xE -DUSE_HAL_DRIVER
 
 ASM_INCLUDES = -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\LCD_240_280\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Core\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\STM32F1xx_HAL_Driver\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\CMSIS\Device\ST\STM32F1xx\Include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\CMSIS\Include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2 -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3
 
-ASM_FLAGS = -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -x assembler-with-cpp -Og -g
+ASM_FLAGS = -g -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -x assembler-with-cpp -Og -g
 
 C_DEFINES = -DDEBUG -DSTM32F103xE -DUSE_HAL_DRIVER
 
 C_INCLUDES = -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\LCD_240_280\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Core\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\STM32F1xx_HAL_Driver\Inc -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\CMSIS\Device\ST\STM32F1xx\Include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Drivers\CMSIS\Include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\include -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2 -IC:\Users\14806\OneDrive\STM32F103ZET6\ZET6_HC_SR04\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3
 
-C_FLAGS = -std=gnu11 -fdiagnostics-color=always -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Og -g
+C_FLAGS = -g -std=gnu11 -fdiagnostics-color=always -mcpu=cortex-m3 -mthumb -mthumb-interwork -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Og -g
 

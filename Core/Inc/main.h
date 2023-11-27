@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Trig_Pin GPIO_PIN_0
+#define Trig_GPIO_Port GPIOG
+#define Echo_Pin GPIO_PIN_1
+#define Echo_GPIO_Port GPIOG
 
 /* USER CODE BEGIN Private defines */
 void Delay_us(__IO uint32_t delay);

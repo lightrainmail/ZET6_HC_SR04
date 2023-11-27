@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,23 +54,16 @@ const osThreadAttr_t APP_LCD_attributs = {
         .priority = (osPriority_t)osPriorityNormal
 };
 
-/*APP_LED Task*/
-osThreadId_t APP_LEDHandle;
-const osThreadAttr_t APP_LED_attributs = {
-        .name = "APP_LED",
-        .stack_size = 128 * 4,
-        .priority = (osPriority_t)osPriorityNormal
-};
 
 /*APP_SR04 Task*/
 osThreadId_t APP_SR04Handle;
 const osThreadAttr_t APP_SR04_attributs = {
         .name = "APP_HC04",
-        .stack_size = 128,
+        .stack_size = 128*4,
 
 };
 
-
+uint16_t TIM_CounterNum = 0;
 /* USER CODE END Variables */
 /* Definitions for APP_Main */
 osThreadId_t APP_MainHandle;
@@ -79,13 +73,9 @@ const osThreadAttr_t APP_Main_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 
-
-
-
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 void APP_LCDTask(void * param);
-void APP_LEDTask(void * param);
 void APP_SR04Task(void * param);
 /* USER CODE END FunctionPrototypes */
 
@@ -123,11 +113,10 @@ void MX_FREERTOS_Init(void) {
   /* creation of APP_Main */
   APP_MainHandle = osThreadNew(APPTask_Main, NULL, &APP_Main_attributes);
 
-    APP_LCDhandle = osThreadNew(APP_LCDTask,NULL,&APP_LCD_attributs);
-    APP_LEDHandle = osThreadNew(APP_LEDTask,NULL,&APP_LED_attributs);
-    APP_SR04Handle = osThreadNew(APP_SR04Task,NULL,&APP_SR04_attributs);
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  APP_LCDhandle = osThreadNew(APP_LCDTask,NULL,&APP_LCD_attributs);
+  APP_SR04Handle = osThreadNew(APP_SR04Task,NULL,&APP_SR04_attributs);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -165,52 +154,31 @@ void APP_LCDTask(void * param) {
 
     /*HC-SR04 test*/
     LCD_ShowString(35,0,"HC-SR04 Test",BLACK,WHITE,24,1);
+
+    /*TIM Counter test*/
+    LCD_ShowString(35,24,"TIM6 Counter:",BLACK,WHITE,24,1);
     while (1) {
+        LCD_ShowIntNum(35,24*2,TIM_CounterNum,5,BLACK,WHITE,24);
         vTaskDelay(Tick);
     }
 }
 
-void APP_LEDTask(void * param) {
-    /*Init LED1->PB5 and LED2->PE5*/
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-
-    HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB,&GPIO_InitStruct);
-
-    TickType_t Tick = pdMS_TO_TICKS(1000);
-
-    for(;;) {
-        HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_5);
-        vTaskDelay(Tick);
-    }
-}
 
 void APP_SR04Task(void * param) {
-    TickType_t tick = pdMS_TO_TICKS(300);
+    TickType_t tick = pdMS_TO_TICKS(61);
 
-    /*Init LED1->PB5 and LED2->PE5*/
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    HAL_TIM_Base_Start(&htim7);
 
-    __HAL_RCC_GPIOE_CLK_ENABLE();
-
-    HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOE,&GPIO_InitStruct);
     for(;;) {
-        HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
+        __HAL_TIM_SET_COUNTER(&htim7,0x0000);
         vTaskDelay(tick);
+
+        taskENTER_CRITICAL();   //protect TIM_CounterNum
+        TIM_CounterNum = __HAL_TIM_GET_COUNTER(&htim7);
+        taskEXIT_CRITICAL();
     }
 }
+
+
 /* USER CODE END Application */
 

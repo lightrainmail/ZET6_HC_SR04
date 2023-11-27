@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "spi.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -89,6 +90,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -152,7 +154,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-#define CPU_FREQUENCY_MHZ    480		// STM32时钟主频
+#define CPU_FREQUENCY_MHZ    72		// STM32时钟主频
 void Delay_us(__IO uint32_t delay)
 {
     int last, curr, val;

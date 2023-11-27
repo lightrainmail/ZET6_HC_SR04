@@ -19,6 +19,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Src/sysmem.c.obj.d"
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Src/system_stm32f1xx.c.obj"
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Src/system_stm32f1xx.c.obj.d"
+  "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Src/tim.c.obj"
+  "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Src/tim.c.obj.d"
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Core/Startup/startup_stm32f103zetx.s.obj"
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Drivers/LCD_240_280/Src/lcd.c.obj"
   "CMakeFiles/ZET6_HC_SR04.elf.dir/Drivers/LCD_240_280/Src/lcd.c.obj.d"
