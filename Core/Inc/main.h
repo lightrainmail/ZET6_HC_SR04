@@ -61,6 +61,7 @@ void Error_Handler(void);
 #define Trig_GPIO_Port GPIOG
 #define Echo_Pin GPIO_PIN_1
 #define Echo_GPIO_Port GPIOG
+#define Echo_EXTI_IRQn EXTI1_IRQn
 
 /* USER CODE BEGIN Private defines */
 void Delay_us(__IO uint32_t delay);

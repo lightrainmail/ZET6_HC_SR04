@@ -63,7 +63,11 @@ const osThreadAttr_t APP_SR04_attributs = {
 
 };
 
-uint16_t TIM_CounterNum = 0;
+uint16_t TIM_CounterNum1 = 0;
+uint16_t TIM_CounterNum2 = 0;
+uint16_t deltaTim = 0;
+float Distance_mm = 0.0;
+uint8_t EXTIState = 0;
 /* USER CODE END Variables */
 /* Definitions for APP_Main */
 osThreadId_t APP_MainHandle;
@@ -150,35 +154,92 @@ void APPTask_Main(void *argument)
 void APP_LCDTask(void * param) {
     /*LCD Init*/
     LCD_Init(WHITE);
-    TickType_t Tick = pdMS_TO_TICKS(1000);
+    TickType_t Tick = pdMS_TO_TICKS(100);
 
     /*HC-SR04 test*/
     LCD_ShowString(35,0,"HC-SR04 Test",BLACK,WHITE,24,1);
 
     /*TIM Counter test*/
-    LCD_ShowString(35,24,"TIM6 Counter:",BLACK,WHITE,24,1);
+    LCD_ShowString(35,24,"Distance",BLACK,WHITE,24,1);
+    LCD_ShowString(35 + 12*7,24*2,"mm",BLACK,WHITE,24,1);
+
     while (1) {
-        LCD_ShowIntNum(35,24*2,TIM_CounterNum,5,BLACK,WHITE,24);
+        LCD_ShowFloatNum1(35,24*2,Distance_mm,6,BLACK,WHITE,24);
         vTaskDelay(Tick);
     }
 }
 
 
-void APP_SR04Task(void * param) {
-    TickType_t tick = pdMS_TO_TICKS(61);
+/*Set EXT1 rising*/
+void EXTI1_Rising(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
 
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+
+    GPIO_InitStruct.Pin = Echo_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING; //Rising
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(Echo_GPIO_Port,&GPIO_InitStruct);
+}
+
+/*Set EXT1 falling*/
+void EXTI1_Falling(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+
+    GPIO_InitStruct.Pin = Echo_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING; //Rising
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(Echo_GPIO_Port,&GPIO_InitStruct);
+}
+
+void APP_SR04Task(void * param) {
+
+    TickType_t tick = pdMS_TO_TICKS(100);
     HAL_TIM_Base_Start(&htim7);
 
-    for(;;) {
-        __HAL_TIM_SET_COUNTER(&htim7,0x0000);
-        vTaskDelay(tick);
 
-        taskENTER_CRITICAL();   //protect TIM_CounterNum
-        TIM_CounterNum = __HAL_TIM_GET_COUNTER(&htim7);
+    for(;;) {
+        //Give Trig 10us high level
+        HAL_GPIO_WritePin(Trig_GPIO_Port,Trig_Pin,GPIO_PIN_SET);
+        taskENTER_CRITICAL();
+        Delay_us(20);
+        taskEXIT_CRITICAL();
+        HAL_GPIO_WritePin(Trig_GPIO_Port,Trig_Pin,GPIO_PIN_RESET);
+
+        __HAL_TIM_SET_COUNTER(&htim7,0x0000);
+
+        //Set Rising
+        EXTI1_Rising();
+
+        taskENTER_CRITICAL();
+        EXTIState = 0;
+        taskEXIT_CRITICAL();
+
+        vTaskDelay(tick);   //delay 100ms
+        taskENTER_CRITICAL();
+        deltaTim = TIM_CounterNum2 - TIM_CounterNum1;
+        Distance_mm = 17.0*deltaTim/100;
         taskEXIT_CRITICAL();
     }
 }
 
+
+/*EXTI1 call back function*/
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(EXTIState == 0) {    //Rising into
+        TIM_CounterNum1 = __HAL_TIM_GET_COUNTER(&htim7);
+        EXTIState = 1;
+
+        //Set exti falling
+        EXTI1_Falling();
+    } else if(EXTIState == 1) {
+        TIM_CounterNum2 = __HAL_TIM_GET_COUNTER(&htim7);
+    }
+
+}
 
 /* USER CODE END Application */
 
