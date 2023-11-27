@@ -64,7 +64,7 @@ const osThreadAttr_t APP_SR04_attributs = {
 };
 
 uint16_t deltaTim = 0;
-float Distance_mm = 0.0;
+uint16_t Distance_mm = 0.0;
 uint8_t EXTIState = 0;
 /* USER CODE END Variables */
 /* Definitions for APP_Main */
@@ -153,7 +153,7 @@ void APPTask_Main(void *argument)
 void APP_LCDTask(void * param) {
     /*LCD Init*/
     LCD_Init(WHITE);
-    TickType_t Tick = pdMS_TO_TICKS(100);
+    TickType_t Tick = pdMS_TO_TICKS(1000);
 
     /*HC-SR04 test*/
     LCD_ShowString(35,0,"HC-SR04 Test",BLACK,WHITE,24,1);
@@ -163,7 +163,8 @@ void APP_LCDTask(void * param) {
     LCD_ShowString(35 + 12*7,24*2,"mm",BLACK,WHITE,24,1);
 
     while (1) {
-        LCD_ShowFloatNum1(35,24*2,Distance_mm,6,BLACK,WHITE,24);
+        LCD_ShowIntNum(35,24*2,Distance_mm,6,BLACK,WHITE,24);
+        LCD_ShowIntNum(35,24*3,deltaTim,5,BLACK,WHITE,24);
         vTaskDelay(Tick);
     }
 }
@@ -217,7 +218,7 @@ void APP_SR04Task(void * param) {
 
         vTaskDelay(tick);   //delay 100ms
         taskENTER_CRITICAL();
-        Distance_mm = 17.0*deltaTim/100;
+        Distance_mm = 17*deltaTim/100;
         taskEXIT_CRITICAL();
     }
 }
@@ -228,13 +229,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if(EXTIState == 0) {    //Rising into
         __HAL_TIM_SET_COUNTER(&htim7,0x0000);
-        EXTIState = 1;
         //Set exti falling
         EXTI1_Falling();
+
     } else if(EXTIState == 1) {
         deltaTim = __HAL_TIM_GET_COUNTER(&htim7);
     }
 
+    EXTIState = 1;
 }
 
 /* USER CODE END Application */
